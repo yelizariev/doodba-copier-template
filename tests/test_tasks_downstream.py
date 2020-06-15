@@ -1,10 +1,10 @@
-import os
 from pathlib import Path
 
 import pytest
 from copier import copy
 from plumbum import ProcessExecutionError, local
 from plumbum.cmd import docker_compose, invoke
+from plumbum.machines.local import LocalCommand
 
 
 def _install_status(module, dbname="devel"):
@@ -22,10 +22,12 @@ def _install_status(module, dbname="devel"):
     ).strip()
 
 
-@pytest.mark.skipif(
-    os.environ.get("DOCKER_TEST") != "1", reason="Missing DOCKER_TEST=1 env variable"
-)
-def test_resetdb(tmp_path: Path, cloned_template: Path, supported_odoo_version: float):
+def test_resetdb(
+    cloned_template: Path,
+    docker: LocalCommand,
+    supported_odoo_version: float,
+    tmp_path: Path,
+):
     """Test the dropdb task.
 
     On this test flow, other downsream tasks are also tested:
